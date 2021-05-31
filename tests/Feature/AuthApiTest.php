@@ -59,7 +59,6 @@ class AuthApiTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json();
         $this->assertEquals($this->getUserData($user), $data);
-        $this->assertEquals(null, $user->remember_token);
     }
 
     public function testPersistentLogin()
@@ -77,7 +76,6 @@ class AuthApiTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json();
         $this->assertEquals($this->getUserData($user), $data);
-        $this->assertNotEquals(null, $user->remember_token);
     }
 
     public function testFailedLogin()
