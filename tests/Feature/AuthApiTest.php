@@ -53,11 +53,31 @@ class AuthApiTest extends TestCase
         $request_data = [
             'email' => $user->email,
             'password' => $plain_password,
+            'remember' => false,
         ];
         $response = $this->postJson("/login", $request_data);
         $response->assertStatus(200);
         $data = $response->json();
         $this->assertEquals($this->getUserData($user), $data);
+        $this->assertEquals(null, $user->remember_token);
+    }
+
+    public function testPersistentLogin()
+    {
+        $plain_password = $this->faker()->password(12);
+        $user = User::factory()->create([
+            'password' => Hash::make($plain_password),
+        ]);
+        $request_data = [
+            'email' => $user->email,
+            'password' => $plain_password,
+            'remember' => true,
+        ];
+        $response = $this->postJson("/login", $request_data);
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertEquals($this->getUserData($user), $data);
+        $this->assertNotEquals(null, $user->remember_token);
     }
 
     public function testFailedLogin()
