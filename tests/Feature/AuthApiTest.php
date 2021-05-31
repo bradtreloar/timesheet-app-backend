@@ -44,7 +44,7 @@ class AuthApiTest extends TestCase
         Notification::fake();
     }
 
-    public function testSuccessfulLoginAttempt()
+    public function testLogin()
     {
         $plain_password = $this->faker()->password(12);
         $user = User::factory()->create([
@@ -60,7 +60,7 @@ class AuthApiTest extends TestCase
         $this->assertEquals($this->getUserData($user), $data);
     }
 
-    public function testFailedLoginAttempt()
+    public function testFailedLogin()
     {
         $plain_password = $this->faker()->password(12);
         $user = User::factory()->create([
