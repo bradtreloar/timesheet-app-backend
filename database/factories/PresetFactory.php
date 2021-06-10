@@ -22,27 +22,8 @@ class PresetFactory extends Factory
      */
     public function definition()
     {
-        $values = [];
-        for ($i = 0; $i < 7; $i++) {
-            $values[] = [
-                "isActive" => true,
-                "startTime" => [
-                    "hour" => (string) random_int(0, 8),
-                    "minute" => (string) random_int(0, 59),
-                ],
-                "endTime" => [
-                    "hour" => (string) random_int(16, 23),
-                    "minute" => (string) random_int(0, 59),
-                ],
-                "breakDuration" => [
-                    "hour" => (string) random_int(0, 1),
-                    "minute" => (string) random_int(0, 59),
-                ],
-            ];
-        }
-
         return [
-            'values' => json_encode($values),
+            'values' => $this->faker->preset(),
         ];
     }
 }

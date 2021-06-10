@@ -37,7 +37,6 @@ class Schema extends SchemaProvider
             'accepts_reminders' => $resource->accepts_reminders,
             'name' => $resource->name,
             'is_admin' => $resource->is_admin,
-            'default_values' => $resource->default_values,
         ];
     }
 

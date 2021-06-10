@@ -30,32 +30,11 @@ class UserCreate extends Command
      */
     public function handle()
     {
-        $default_values = [];
-        for ($i = 0; $i < 7; $i++) {
-            $default_values[] = [
-                "isActive" => false,
-                "reason" => "rostered-day-off",
-                "startTime" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-                "endTime" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-                "breakDuration" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-            ];
-        }
-
         try {
             $user = new User([
                 "name" => $this->argument("name"),
                 "email" => $this->argument("email"),
                 'is_admin' => $this->option("admin"),
-                'default_values' => json_encode($default_values),
             ]);
             $user->markEmailAsVerified();
             $user->save();

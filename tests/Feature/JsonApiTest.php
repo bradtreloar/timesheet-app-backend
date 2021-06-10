@@ -164,8 +164,8 @@ class JsonApiTest extends TestCase
     /**
      * Create user data from a user object
      */
-    protected function userDataFromUser(User $user) {
-        $user_data = [
+    protected function makeNewUserResource(User $user) {
+        $resource = [
             "type" => "users",
             "attributes" => [
                 "name" => $user->name,
@@ -173,15 +173,14 @@ class JsonApiTest extends TestCase
                 "phone_number" => $user->phone_number,
                 "accepts_reminders" => $user->accepts_reminders,
                 "is_admin" => $user->is_admin,
-                "default_values" => $user->default_values,
             ],
         ];
 
         if ($user->exists) {
-            $user_data['id'] = (string) $user->id;
+            $resource['id'] = (string) $user->id;
         }
 
-        return $user_data;
+        return $resource;
     }
 
     public function testRejectUnauthenticated()
@@ -198,7 +197,7 @@ class JsonApiTest extends TestCase
         $user = User::factory()->make();
 
         $request_data = [
-            "data" => $this->userDataFromUser($user),
+            "data" => $this->makeNewUserResource($user),
         ];
 
         $response = $this->actingAs($user)
@@ -222,7 +221,7 @@ class JsonApiTest extends TestCase
         $user->name = $name;
 
         $request_data = [
-            "data" => $this->userDataFromUser($user),
+            "data" => $this->makeNewUserResource($user),
         ];
 
         $response = $this->actingAs($user)
@@ -241,7 +240,7 @@ class JsonApiTest extends TestCase
         $old_password = $user->password;
         $new_password = Hash::make(Str::random(40));
 
-        $user_data = $this->userDataFromUser($user);
+        $user_data = $this->makeNewUserResource($user);
         $user_data['attributes']['password'] = $new_password;
         $request_data = [
             "data" => $user_data,

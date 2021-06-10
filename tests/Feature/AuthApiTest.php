@@ -30,7 +30,6 @@ class AuthApiTest extends TestCase
             'accepts_reminders' => $user->accepts_reminders,
             'name' => $user->name,
             'is_admin' => $user->is_admin,
-            'default_values' => $user->default_values,
         ];
     }
 

@@ -17,11 +17,11 @@ class FakerServiceProvider extends ServiceProvider
         $this->app->singleton(Faker::class, function ($app) {
             $faker = \Faker\Factory::create();
             $newClass = new class($faker) extends \Faker\Provider\Base {
-                public function defaultShifts()
+                public function preset()
                 {
-                    $default_values = [];
+                    $preset_values = [];
                     for ($i = 0; $i < 7; $i++) {
-                        $default_values[] = [
+                        $preset_values[] = [
                             "isActive" => true,
                             "startTime" => [
                                 "hour" => (string) random_int(0, 8),
@@ -37,7 +37,7 @@ class FakerServiceProvider extends ServiceProvider
                             ],
                         ];
                     }
-                    return json_encode($default_values);
+                    return json_encode($preset_values);
                 }
             };
 

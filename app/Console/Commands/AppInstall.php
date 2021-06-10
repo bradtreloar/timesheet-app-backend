@@ -35,32 +35,11 @@ class AppInstall extends Command
      */
     public function handle()
     {
-        $default_values = [];
-        for ($i = 0; $i < 7; $i++) {
-            $default_values[] = [
-                "isActive" => false,
-                "reason" => "rostered-day-off",
-                "startTime" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-                "endTime" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-                "breakDuration" => [
-                    "hour" => "",
-                    "minute" => "",
-                ],
-            ];
-        }
-
         try {
             $user = new User([
                 "name" => $this->option("admin-name"),
                 "email" => $this->option("admin-email"),
                 'is_admin' => true,
-                'default_values' => json_encode($default_values),
             ]);
             $user->password = Hash::make($this->option("admin-pass"));
             $user->markEmailAsVerified();
