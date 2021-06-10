@@ -190,26 +190,72 @@ class JsonApiTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function testFetchAllUsers() {
+        $this->seed();
+        $user = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        $this->assertDatabaseCount('users', 3);
+        $response = $this->actingAs($user)
+            ->jsonApi('GET', "/users");
+        $response->assertJson([
+            "data" => [
+                ["type" => "users" ],
+                ["type" => "users" ],
+                ["type" => "users" ],
+            ],
+        ]);
+    }
+
+    public function testDenyFetchAllUsers() {
+        $this->seed();
+        $user = User::factory()->create([
+            'is_admin' => false,
+        ]);
+        $this->assertDatabaseCount('users', 3);
+        $response = $this->actingAs($user)
+            ->jsonApi('GET', "/users");
+        $response->assertForbidden();
+    }
+
     public function testCreateUser()
     {
         $this->seed();
-        $this->assertDatabaseCount('users', 2);
+        $admin_user = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        $this->assertDatabaseCount('users', 3);
         $user = User::factory()->make();
-
         $request_data = [
             "data" => $this->makeNewUserResource($user),
         ];
-
-        $response = $this->actingAs($user)
+        $response = $this->actingAs($admin_user)
             ->jsonApi("POST", "/users", $request_data);
         $response->assertStatus(201);
         $response->assertJson([
             "data" => [
                 "type" => "users",
-                "id" => "3",
+                "id" => "4",
             ]
         ]);
 
+        $this->assertDatabaseCount('users', 4);
+    }
+
+    public function testDenyCreateUser()
+    {
+        $this->seed();
+        $admin_user = User::factory()->create([
+            'is_admin' => false,
+        ]);
+        $this->assertDatabaseCount('users', 3);
+        $user = User::factory()->make();
+        $request_data = [
+            "data" => $this->makeNewUserResource($user),
+        ];
+        $response = $this->actingAs($admin_user)
+            ->jsonApi("POST", "/users", $request_data);
+        $response->assertForbidden();
         $this->assertDatabaseCount('users', 3);
     }
 

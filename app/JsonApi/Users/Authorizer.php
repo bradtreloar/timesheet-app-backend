@@ -22,7 +22,7 @@ class Authorizer extends AbstractAuthorizer
      */
     public function index($type, $request)
     {
-        return false;
+        $this->can("viewAny", $type);
     }
 
     /**
@@ -38,7 +38,7 @@ class Authorizer extends AbstractAuthorizer
      */
     public function create($type, $request)
     {
-        return false;
+        $this->can("create", $type);
     }
 
     /**
