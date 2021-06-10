@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi\Users;
+namespace App\JsonApi\Presets;
 
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
@@ -31,7 +31,7 @@ class Adapter extends AbstractAdapter
      */
     public function __construct(StandardStrategy $paging)
     {
-        parent::__construct(new \App\Models\User(), $paging);
+        parent::__construct(new \App\Models\Preset(), $paging);
     }
 
     /**
@@ -44,14 +44,8 @@ class Adapter extends AbstractAdapter
         $this->filterWithScopes($query, $filters);
     }
 
-    protected function timesheets()
+    protected function user()
     {
-        return $this->hasMany();
+        return $this->belongsTo();
     }
-
-    protected function presets()
-    {
-        return $this->hasMany();
-    }
-
 }

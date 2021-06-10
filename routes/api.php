@@ -56,6 +56,11 @@ JsonApi::register('default')
                     $relations->hasOne('timesheet');
                 }
             );
+            $api->resource('presets')->relationships(
+                function ($relations) {
+                    $relations->hasOne('user');
+                }
+            );
             $api->resource('settings');
         }
     );

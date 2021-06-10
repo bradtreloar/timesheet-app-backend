@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Preset;
 use App\Models\Setting;
 use App\Models\Timesheet;
 use App\Models\User;
@@ -127,6 +128,33 @@ class JsonApiTest extends TestCase
                     "data" => [
                         "type" => "timesheets",
                         "id" => "{$timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Creates a preset resource.
+     *
+     * @param User $user
+     *   The preset's owner.
+     *
+     * @return array
+     *   The preset resource data.
+     */
+    protected function makeNewPresetResource(Preset $preset): array
+    {
+        return  [
+            "type" => "presets",
+            "attributes" => [
+                "values" => $preset->values,
+            ],
+            "relationships" => [
+                "user" => [
+                    "data" => [
+                        "type" => "users",
+                        "id" => "{$preset->user->id}",
                     ]
                 ],
             ],
@@ -453,5 +481,105 @@ class JsonApiTest extends TestCase
             ]
         ]);
         $this->assertDatabaseCount("absences", 3);
+    }
+
+    public function testFetchPreset()
+    {
+        $this->seed();
+        $preset = Preset::first();
+        $user = $preset->user;
+        $response = $this->actingAs($user)
+            ->jsonApi("GET", "/presets/{$preset->id}");
+        $response->assertStatus(200);
+        $response->assertJson([
+            "data" => [
+                "type" => "presets",
+                "id" => $preset->id,
+            ],
+        ]);
+    }
+
+    public function testDenyFetchAllPresets()
+    {
+        $this->seed();
+        $user = User::find(1);
+        $response = $this->actingAs($user)
+            ->jsonApi("GET", "/presets");
+        $response->assertStatus(403);
+    }
+
+    public function testDenyFetchPresetForOtherUser()
+    {
+        $this->seed();
+        $preset = Preset::find(1);
+        $user = $preset->user;
+        // Try to retrieve preset that doesn"t belong to user.
+        $preset = Preset::find(2);
+        $this->assertEquals(2, $preset->id);
+        $response = $this->actingAs($user)
+            ->get("/presets/{$preset->id}");
+        $response->assertStatus(403);
+    }
+
+    public function testCreatePreset()
+    {
+        $this->seed();
+        $user = User::first();
+        $preset = Preset::factory()->make([
+            'user_id' => $user->id,
+        ]);
+        $request_data = [
+            "data" => $this->makeNewPresetResource($preset),
+        ];
+        $response = $this->actingAs($user)
+            ->jsonApi("POST", "/presets", $request_data);
+        $response->assertStatus(201);
+        $response->assertJson([
+            "data" => [
+                "type" => "presets",
+                "id" => "3",
+            ]
+        ]);
+        $this->assertDatabaseCount("presets", 3);
+    }
+
+    public function testDenyCreatePresetForOtherUser()
+    {
+        $this->seed();
+        $user = User::find(1);
+        $other_user = User::find(2);
+        $preset = Preset::factory()->make([
+            'user_id' => $other_user->id,
+        ]);
+        $request_data = [
+            "data" => $this->makeNewPresetResource($preset),
+        ];
+        $response = $this->actingAs($user)
+            ->jsonApi("POST", "/presets", $request_data);
+        $response->assertStatus(403);
+        $this->assertDatabaseCount("presets", 2);
+    }
+
+    public function testDeletePreset()
+    {
+        $this->seed();
+        $preset = Preset::first();
+        $user = $preset->user;
+        $response = $this->actingAs($user)
+            ->jsonApi("DELETE", "/presets/{$preset->id}");
+        $response->assertStatus(204);
+        $this->assertDatabaseCount("presets", 1);
+    }
+
+    public function testDenyDeletePresetForOtherUser()
+    {
+        $this->seed();
+        $preset = Preset::find(1);
+        $other_preset = Preset::find(2);
+        $user = $preset->user;
+        $response = $this->actingAs($user)
+            ->jsonApi("DELETE", "/presets/{$other_preset->id}");
+        $response->assertStatus(403);
+        $this->assertDatabaseCount("presets", 2);
     }
 }

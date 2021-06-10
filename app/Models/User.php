@@ -57,6 +57,11 @@ class User extends Authenticatable
         return $this->hasMany(Timesheet::class);
     }
 
+    public function presets()
+    {
+        return $this->hasMany(Preset::class);
+    }
+
     /**
      * Returns a snakecase version of the user's name, with whitespace, hyphens,
      * apostrophes and punctuation replaced by underscores or just removed.

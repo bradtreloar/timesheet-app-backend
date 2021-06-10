@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Absence;
+use App\Models\Preset;
 use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\Timesheet;
@@ -33,6 +34,10 @@ class DatabaseSeeder extends Seeder
 
             Absence::factory()->create([
                 'timesheet_id' => $timesheet->id,
+            ]);
+
+            Preset::factory()->create([
+                'user_id' => $user->id,
             ]);
         }
 

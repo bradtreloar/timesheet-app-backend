@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi\Users;
+namespace App\JsonApi\Presets;
 
 use Neomerx\JsonApi\Schema\SchemaProvider;
 
@@ -10,10 +10,10 @@ class Schema extends SchemaProvider
     /**
      * @var string
      */
-    protected $resourceType = 'users';
+    protected $resourceType = 'presets';
 
     /**
-     * @param \App\Models\User $resource
+     * @param \App\Models\Preset $resource
      *      the domain record being serialized.
      * @return string
      */
@@ -23,7 +23,7 @@ class Schema extends SchemaProvider
     }
 
     /**
-     * @param \App\Models\User $resource
+     * @param \App\Models\Preset $resource
      *      the domain record being serialized.
      * @return array
      */
@@ -32,23 +32,14 @@ class Schema extends SchemaProvider
         return [
             'created' => $resource->created_at->toISO8601String(),
             'changed' => $resource->updated_at->toISO8601String(),
-            'email' => $resource->email,
-            'phone_number' => $resource->phone_number ?: "",
-            'accepts_reminders' => $resource->accepts_reminders,
-            'name' => $resource->name,
-            'is_admin' => $resource->is_admin,
-            'default_values' => $resource->default_values,
+            'values' => $resource->values,
         ];
     }
 
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
         return [
-            'timesheets' => [
-                self::SHOW_SELF => true,
-                self::SHOW_RELATED => true,
-            ],
-            'presets' => [
+            'user' => [
                 self::SHOW_SELF => true,
                 self::SHOW_RELATED => true,
             ],
