@@ -164,7 +164,8 @@ class JsonApiTest extends TestCase
     /**
      * Create user data from a user object
      */
-    protected function makeNewUserResource(User $user) {
+    protected function makeNewUserResource(User $user)
+    {
         $resource = [
             "type" => "users",
             "attributes" => [
@@ -190,7 +191,8 @@ class JsonApiTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function testFetchAllUsers() {
+    public function testFetchAllUsers()
+    {
         $this->seed();
         $user = User::factory()->create([
             'is_admin' => true,
@@ -200,14 +202,15 @@ class JsonApiTest extends TestCase
             ->jsonApi('GET', "/users");
         $response->assertJson([
             "data" => [
-                ["type" => "users" ],
-                ["type" => "users" ],
-                ["type" => "users" ],
+                ["type" => "users"],
+                ["type" => "users"],
+                ["type" => "users"],
             ],
         ]);
     }
 
-    public function testDenyFetchAllUsers() {
+    public function testDenyFetchAllUsers()
+    {
         $this->seed();
         $user = User::factory()->create([
             'is_admin' => false,
@@ -279,19 +282,44 @@ class JsonApiTest extends TestCase
         $this->assertEquals($name, $updated_user->name);
     }
 
+    public function testDenyUpdateOtherUser()
+    {
+        $this->seed();
+        $user = User::find(1);
+        $other_user = User::find(2);
+        $original_name = $other_user->name;
+        $other_user->name = $this->faker->name();
+        $request_data = [
+            "data" => $this->makeNewUserResource($other_user),
+        ];
+        $response = $this->actingAs($user)
+            ->jsonApi("PATCH", "/users/{$other_user->id}", $request_data);
+        $response->assertForbidden();
+        $updated_user = User::find(2);
+        $this->assertEquals($original_name, $updated_user->name);
+    }
+
+    public function testDenyDeleteUser()
+    {
+        $this->seed();
+        $user = User::find(1);
+        $other_user = User::find(2);
+        $response = $this->actingAs($user)
+            ->jsonApi("DELETE", "/users/{$other_user->id}");
+        $response->assertForbidden();
+    }
+
     public function testIgnoreChangeUserPassword()
     {
         $this->seed();
         $user = User::find(1);
         $old_password = $user->password;
         $new_password = Hash::make(Str::random(40));
-
         $user_data = $this->makeNewUserResource($user);
         $user_data['attributes']['password'] = $new_password;
         $request_data = [
             "data" => $user_data,
         ];
-
         $response = $this->actingAs($user)
             ->jsonApi("PATCH", "/users/{$user->id}", $request_data);
         $response->assertStatus(200);
