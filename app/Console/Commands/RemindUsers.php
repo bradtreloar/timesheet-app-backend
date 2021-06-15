@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Events\TimesheetDue;
+use App\Models\Absence;
 use App\Models\Setting;
+use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
 use Carbon\Carbon;
@@ -51,24 +53,32 @@ class RemindUsers extends Command
         $timesheets = Timesheet::where([
             'user_id' => $user->id,
         ])->get();
+        $start_of_timesheet_week = static::getStartOfCurrentTimesheetWeek();
         if ($timesheets) {
             foreach ($timesheets as $timesheet) {
-                $shifts = $timesheet->shifts;
-                // Timesheet is current if at least one of the shifts or
-                // absences falls within the last 7 days.
-                foreach ($shifts as $shift) {
-                    if ($shift->start->diffInDays(null, false) <= 7) {
-                        return true;
-                    }
-                }
-                $absences = $timesheet->absences;
-                foreach ($absences as $absence) {
-                    if ($absence->date->diffInDays(null, false) <= 7) {
+                /** @var (\App\Models\Absence|\App\Models\Shift)[] $entries */
+                $entries = $timesheet->shifts_and_absences;
+                foreach ($entries as $entry) {
+                    $diff = $start_of_timesheet_week->diffInDays($entry->date, false);
+                    if ($diff >= 0 && $diff < 7) {
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * Get the start of the timesheet week.
+     */
+    public static function getStartOfCurrentTimesheetWeek()
+    {
+        $today = Carbon::now()->startOfDay();
+        $start_of_timesheet_week = Carbon::now()->startOfWeek();
+        if ($start_of_timesheet_week->diffInDays($today) == 0) {
+            $start_of_timesheet_week = $start_of_timesheet_week->subDays(7);
+        }
+        return $start_of_timesheet_week;
     }
 }
