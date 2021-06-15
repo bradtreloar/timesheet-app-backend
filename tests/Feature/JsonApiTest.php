@@ -143,9 +143,9 @@ class JsonApiTest extends TestCase
      * @return array
      *   The preset resource data.
      */
-    protected function makeNewPresetResource(Preset $preset): array
+    protected function makePresetResource(Preset $preset): array
     {
-        return  [
+        $resource = [
             "type" => "presets",
             "attributes" => [
                 "values" => $preset->values,
@@ -159,12 +159,18 @@ class JsonApiTest extends TestCase
                 ],
             ],
         ];
+
+        if ($preset->exists) {
+            $resource['id'] = (string) $preset->id;
+        }
+
+        return $resource;
     }
 
     /**
      * Create user data from a user object
      */
-    protected function makeNewUserResource(User $user)
+    protected function makeUserResource(User $user)
     {
         $resource = [
             "type" => "users",
@@ -189,6 +195,27 @@ class JsonApiTest extends TestCase
         $this->seed();
         $response = $this->jsonApi("GET", "/users");
         $response->assertStatus(401);
+    }
+
+    public function testFetchUser()
+    {
+        $this->seed();
+        $user = User::first();
+        $response = $this->actingAs($user)
+            ->jsonApi('GET', "/users/{$user->id}");
+        $response->assertJson([
+            'data' => $this->makeUserResource($user),
+        ]);
+    }
+
+    public function testDenyFetchUser()
+    {
+        $this->seed();
+        $user = User::find(1);
+        $other_user = User::find(2);
+        $response = $this->actingAs($user)
+            ->jsonApi('GET', "/users/{$other_user->id}");
+        $response->assertForbidden();
     }
 
     public function testFetchAllUsers()
@@ -230,7 +257,7 @@ class JsonApiTest extends TestCase
         $this->assertDatabaseCount('users', 3);
         $user = User::factory()->make();
         $request_data = [
-            "data" => $this->makeNewUserResource($user),
+            "data" => $this->makeUserResource($user),
         ];
         $response = $this->actingAs($admin_user)
             ->jsonApi("POST", "/users", $request_data);
@@ -254,7 +281,7 @@ class JsonApiTest extends TestCase
         $this->assertDatabaseCount('users', 3);
         $user = User::factory()->make();
         $request_data = [
-            "data" => $this->makeNewUserResource($user),
+            "data" => $this->makeUserResource($user),
         ];
         $response = $this->actingAs($admin_user)
             ->jsonApi("POST", "/users", $request_data);
@@ -270,7 +297,7 @@ class JsonApiTest extends TestCase
         $user->name = $name;
 
         $request_data = [
-            "data" => $this->makeNewUserResource($user),
+            "data" => $this->makeUserResource($user),
         ];
 
         $response = $this->actingAs($user)
@@ -290,7 +317,7 @@ class JsonApiTest extends TestCase
         $original_name = $other_user->name;
         $other_user->name = $this->faker->name();
         $request_data = [
-            "data" => $this->makeNewUserResource($other_user),
+            "data" => $this->makeUserResource($other_user),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("PATCH", "/users/{$other_user->id}", $request_data);
@@ -315,7 +342,7 @@ class JsonApiTest extends TestCase
         $user = User::find(1);
         $old_password = $user->password;
         $new_password = Hash::make(Str::random(40));
-        $user_data = $this->makeNewUserResource($user);
+        $user_data = $this->makeUserResource($user);
         $user_data['attributes']['password'] = $new_password;
         $request_data = [
             "data" => $user_data,
@@ -602,7 +629,7 @@ class JsonApiTest extends TestCase
             'user_id' => $user->id,
         ]);
         $request_data = [
-            "data" => $this->makeNewPresetResource($preset),
+            "data" => $this->makePresetResource($preset),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/presets", $request_data);
@@ -625,7 +652,7 @@ class JsonApiTest extends TestCase
             'user_id' => $other_user->id,
         ]);
         $request_data = [
-            "data" => $this->makeNewPresetResource($preset),
+            "data" => $this->makePresetResource($preset),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/presets", $request_data);
