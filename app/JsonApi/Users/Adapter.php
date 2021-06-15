@@ -54,4 +54,9 @@ class Adapter extends AbstractAdapter
         return $this->hasMany();
     }
 
+    protected function defaultPreset()
+    {
+        return $this->hasOne();
+    }
+
 }

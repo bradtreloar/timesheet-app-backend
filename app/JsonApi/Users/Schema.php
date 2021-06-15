@@ -50,10 +50,18 @@ class Schema extends SchemaProvider
             'presets' => [
                 self::SHOW_SELF => true,
                 self::SHOW_RELATED => true,
+                self::SHOW_DATA => isset($includeRelationships['presets']),
+                self::DATA => function () use ($resource) {
+                    return $resource->presets;
+                },
             ],
             'default_preset' => [
                 self::SHOW_SELF => true,
                 self::SHOW_RELATED => true,
+                self::SHOW_DATA => isset($includeRelationships['default_preset']),
+                self::DATA => function () use ($resource) {
+                    return $resource->defaultPreset;
+                },
             ],
         ];
     }

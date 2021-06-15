@@ -208,6 +208,26 @@ class JsonApiTest extends TestCase
         ]);
     }
 
+    public function testFetchUserIncludingDefaultPreset()
+    {
+        $this->seed();
+        $user = User::first();
+        $response = $this->actingAs($user)
+            ->jsonApi('GET', "/users/{$user->id}?include=default_preset");
+        $response->assertSuccessful();
+        $response->assertJson([
+            'data' => $this->makeUserResource($user),
+        ]);
+        $response->assertJson([
+            'included' => [
+                [
+                    'type' => 'presets',
+                    'id' => $user->defaultPreset->id,
+                ]
+            ],
+        ]);
+    }
+
     public function testDenyFetchUser()
     {
         $this->seed();
