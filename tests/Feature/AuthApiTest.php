@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Preset;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +24,8 @@ class AuthApiTest extends TestCase
 
     protected function getUserData($user)
     {
+        $default_preset = $user->defaultPreset;
+
         return [
             'id' => $user->id,
             'email' => $user->email,
@@ -30,6 +33,7 @@ class AuthApiTest extends TestCase
             'accepts_reminders' => $user->accepts_reminders,
             'name' => $user->name,
             'is_admin' => $user->is_admin,
+            'default_preset_id' => $default_preset ? $default_preset->id : null,
         ];
     }
 

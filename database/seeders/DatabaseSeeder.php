@@ -36,9 +36,12 @@ class DatabaseSeeder extends Seeder
                 'timesheet_id' => $timesheet->id,
             ]);
 
-            Preset::factory()->create([
+            $preset = Preset::factory()->create([
                 'user_id' => $user->id,
             ]);
+
+            $user->defaultPreset($preset);
+            $user->save();
         }
 
         $timesheetRecipients = [];

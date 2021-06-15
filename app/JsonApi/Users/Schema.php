@@ -51,6 +51,10 @@ class Schema extends SchemaProvider
                 self::SHOW_SELF => true,
                 self::SHOW_RELATED => true,
             ],
+            'default_preset' => [
+                self::SHOW_SELF => true,
+                self::SHOW_RELATED => true,
+            ],
         ];
     }
 }

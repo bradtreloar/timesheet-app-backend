@@ -15,6 +15,7 @@ class AlterUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('default_values');
+            $table->bigInteger('default_preset_id')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ class AlterUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('default_values', 2048);
+            $table->dropColumn('default_preset_id');
         });
     }
 }

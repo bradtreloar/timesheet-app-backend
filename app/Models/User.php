@@ -62,6 +62,11 @@ class User extends Authenticatable
         return $this->hasMany(Preset::class);
     }
 
+    public function defaultPreset()
+    {
+        return $this->hasOne(Preset::class);
+    }
+
     /**
      * Returns a snakecase version of the user's name, with whitespace, hyphens,
      * apostrophes and punctuation replaced by underscores or just removed.
