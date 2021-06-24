@@ -8,6 +8,7 @@ use App\Mail\WelcomeMessage;
 use App\Models\Setting;
 use App\Models\Timesheet;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
@@ -94,6 +95,9 @@ class MailTest extends TestCase
         $this->seed();
         $timesheet = Timesheet::first();
         $user = $timesheet->user;
+        $timesheet->state = Timesheet::STATE_COMPLETED;
+        $timesheet->submitted_at = Carbon::now();
+        $timesheet->save();
         $html_output = (new TimesheetNotification($timesheet))->render();
         $this->assertStringContainsString("Timesheet submitted", $html_output);
         $this->assertStringContainsString($user->name, $html_output);
