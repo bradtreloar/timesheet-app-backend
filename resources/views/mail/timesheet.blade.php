@@ -11,7 +11,7 @@
 | | |
 | :-- | :-- |
 | __Employee__  | {{ $timesheet->user->name }} |
-| __Submitted__ | {{ $timesheet->created_at->format("j F Y") }} |
+| __Submitted__ | {{ $timesheet->submitted_at->format("j F Y") }} |
 @endcomponent
 
 <br/>

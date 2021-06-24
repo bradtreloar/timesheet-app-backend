@@ -43,7 +43,7 @@ th {
                         Submitted
                     </th>
                     <td style="width: 100%;">
-                        {{ $timesheet->created_at->format("j F Y") }}
+                        {{ $timesheet->submitted_at->format("j F Y") }}
                     </td>
                 </tr>
             </tbody>
