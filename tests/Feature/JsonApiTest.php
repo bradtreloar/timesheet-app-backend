@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Absence;
 use App\Models\Leave;
 use App\Models\Preset;
 use App\Models\Setting;
+use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,97 +54,115 @@ class JsonApiTest extends TestCase
     }
 
     /**
-     * Creates a timesheet data array.
+     * Creates a timesheet resource.
      *
-     * @param User $user
-     *   The timesheet's owner.
+     * @param \App\Models\Timesheet $timesheet
+     *   The timesheet.
      *
      * @return array
-     *   The timesheet data.
+     *   The timesheet resource data.
      */
-    protected function fakeTimesheetData(User $user): array
+    protected function makeTimesheetResource(Timesheet $timesheet): array
     {
-        return  [
+        $resource = [
             "type" => "timesheets",
             "attributes" => [
-                "comment" => Str::random(),
+                "comment" => $timesheet->comment,
             ],
             "relationships" => [
                 "user" => [
                     "data" => [
                         "type" => "users",
-                        "id" => "{$user->id}",
+                        "id" => "{$timesheet->user->id}",
                     ]
                 ],
             ],
         ];
+
+        if ($timesheet->exists) {
+            $resource['id'] = (string) $timesheet->id;
+        }
+
+        return $resource;
     }
 
     /**
-     * Creates an absence data array.
+     * Creates a shift resource.
      *
-     * @param Timesheet $timesheet
-     *   The absence's timesheet.
-     *
-     * @return array
-     *   The absence data.
-     */
-    protected function fakeAbsenceData(Timesheet $timesheet): array
-    {
-        return [
-            "type" => "absences",
-            "attributes" => [
-                "date" => $this->faker->iso8601(),
-                "reason" => "absent:sick-day",
-            ],
-            "relationships" => [
-                "timesheet" => [
-                    "data" => [
-                        "type" => "timesheets",
-                        "id" => "{$timesheet->id}",
-                    ]
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Creates a shift data array.
-     *
-     * @param Timesheet $timesheet
-     *   The shift's timesheet.
+     * @param \App\Models\Shift $shift
+     *   The shift.
      *
      * @return array
-     *   The shift data.
+     *   The shift resource data.
      */
-    protected function fakeShiftData(Timesheet $timesheet): array
+    protected function makeShiftResource(Shift $shift): array
     {
-        return [
+        $resource = [
             "type" => "shifts",
             "attributes" => [
-                "start" => $this->faker->iso8601(),
-                "end" => $this->faker->iso8601(),
-                "break_duration" => 45,
+                "start" => $shift->start->toISO8601String(),
+                "end" => $shift->end->toISO8601String(),
+                "break_duration" => $shift->break_duration,
             ],
             "relationships" => [
                 "timesheet" => [
                     "data" => [
                         "type" => "timesheets",
-                        "id" => "{$timesheet->id}",
+                        "id" => "{$shift->timesheet->id}",
                     ]
                 ],
             ],
         ];
+
+        if ($shift->exists) {
+            $resource['id'] = (string) $shift->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates an absence resource.
+     *
+     * @param \App\Models\Absence $absence
+     *   The absence.
+     *
+     * @return array
+     *   The absence resource data.
+     */
+    protected function makeAbsenceResource(Absence $absence): array
+    {
+        $resource = [
+            "type" => "absences",
+            "attributes" => [
+                "date" => $absence->date->toISO8601String(),
+                "reason" => $absence->reason,
+            ],
+            "relationships" => [
+                "timesheet" => [
+                    "data" => [
+                        "type" => "timesheets",
+                        "id" => "{$absence->timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($absence->exists) {
+            $resource['id'] = (string) $absence->id;
+        }
+
+        return $resource;
     }
 
     /**
      * Creates a leave resource.
      *
-     * @param User $user
-     *   The preset's owner.
+     * @param \App\Models\Leave $leave
+     *   The leave.
      *
      * @return array
-     *   The preset resource data.
+     *   The leave resource data.
      */
     protected function makeLeaveResource(Leave $leave): array
     {
@@ -173,8 +193,8 @@ class JsonApiTest extends TestCase
     /**
      * Creates a preset resource.
      *
-     * @param User $user
-     *   The preset's owner.
+     * @param \App\Models\Preset $preset
+     *   The preset.
      *
      * @return array
      *   The preset resource data.
@@ -204,7 +224,13 @@ class JsonApiTest extends TestCase
     }
 
     /**
-     * Create user data from a user object
+     * Creates a user resource.
+     *
+     * @param \App\Models\User $user
+     *   The user.
+     *
+     * @return array
+     *   The user resource data.
      */
     protected function makeUserResource(User $user)
     {
@@ -230,7 +256,7 @@ class JsonApiTest extends TestCase
     {
         $this->seed();
         $response = $this->jsonApi("GET", "/users");
-        $response->assertStatus(401);
+        $response->assertUnauthorized();
     }
 
     public function testFetchUser()
@@ -317,7 +343,7 @@ class JsonApiTest extends TestCase
         ];
         $response = $this->actingAs($admin_user)
             ->jsonApi("POST", "/users", $request_data);
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJson([
             "data" => [
                 "type" => "users",
@@ -358,7 +384,7 @@ class JsonApiTest extends TestCase
 
         $response = $this->actingAs($user)
             ->jsonApi("PATCH", "/users/{$user->id}", $request_data);
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertJson($request_data);
 
         $updated_user = User::find(1);
@@ -405,7 +431,7 @@ class JsonApiTest extends TestCase
         ];
         $response = $this->actingAs($user)
             ->jsonApi("PATCH", "/users/{$user->id}", $request_data);
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $updated_user = User::find(1);
         $this->assertEquals($old_password, $updated_user->password);
         $response->assertJsonMissing([
@@ -425,7 +451,7 @@ class JsonApiTest extends TestCase
         $user->save();
         $settings = Setting::all();
         $response = $this->actingAs($user)->jsonApi("GET", "/settings");
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $this->assertCount(1, $response->json("data"));
         foreach ($settings as $index => $setting) {
             $response->assertJson([
@@ -461,7 +487,7 @@ class JsonApiTest extends TestCase
         ];
         $response = $this->actingAs($user)
             ->jsonApi("PATCH", "/settings/{$setting->id}", $request_data);
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $setting = Setting::find($sid);
         $this->assertEquals($newValue, $setting->value);
     }
@@ -473,7 +499,7 @@ class JsonApiTest extends TestCase
         $user = $timesheet->user;
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/timesheets/{$timesheet->id}");
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertJson([
             "data" => [
                 "id" => "1",
@@ -488,7 +514,7 @@ class JsonApiTest extends TestCase
         $user = $timesheet->user;
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/timesheets/{$timesheet->id}?include=shifts");
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $id = $response->json("data.id");
         $this->assertEquals("1", $id);
         $shifts = $response->json("included");
@@ -502,7 +528,7 @@ class JsonApiTest extends TestCase
         $user = User::find(1);
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/timesheets");
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testDenyFetchTimesheetForOtherUser()
@@ -515,7 +541,7 @@ class JsonApiTest extends TestCase
         $this->assertEquals(2, $timesheet->id);
         $response = $this->actingAs($user)
             ->get("/timesheets/{$timesheet->id}");
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testFetchAllTimesheetsForUser()
@@ -524,7 +550,7 @@ class JsonApiTest extends TestCase
         $user = User::first();
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/users/{$user->id}/timesheets");
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $data = $response->json("data");
         $this->assertEquals(1, count($data));
     }
@@ -536,19 +562,22 @@ class JsonApiTest extends TestCase
         $other_user = User::find(2);
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/users/{$other_user->id}/timesheets");
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testCreateTimesheet()
     {
         $this->seed();
         $user = User::first();
+        $timesheet = Timesheet::factory()->make([
+            'user_id' => $user->id,
+        ]);
         $request_data = [
-            "data" => $this->fakeTimesheetData($user),
+            "data" => $this->makeTimesheetResource($timesheet),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/timesheets", $request_data);
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJson([
             "data" => [
                 "type" => "timesheets",
@@ -563,12 +592,15 @@ class JsonApiTest extends TestCase
         $this->seed();
         $user = User::find(1);
         $other_user = User::find(2);
+        $timesheet = Timesheet::factory()->make([
+            'user_id' => $other_user->id,
+        ]);
         $request_data = [
-            "data" => $this->fakeTimesheetData($other_user),
+            "data" => $this->makeTimesheetResource($timesheet),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/timesheets", $request_data);
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $this->assertDatabaseCount("timesheets", 2);
     }
 
@@ -577,11 +609,9 @@ class JsonApiTest extends TestCase
         $this->seed();
         $timesheet = Timesheet::first();
         $user = $timesheet->user;
-
         $response = $this->actingAs($user)
             ->jsonApi("DELETE", "/timesheets/{$timesheet->id}");
-
-        $response->assertStatus(204);
+        $response->assertNoContent();
         $this->assertDatabaseCount("timesheets", 1);
     }
 
@@ -591,11 +621,9 @@ class JsonApiTest extends TestCase
         $timesheet = Timesheet::find(1);
         $other_timesheet = Timesheet::find(2);
         $user = $timesheet->user;
-
         $response = $this->actingAs($user)
             ->jsonApi("DELETE", "/timesheets/{$other_timesheet->id}");
-
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $this->assertDatabaseCount("timesheets", 2);
     }
 
@@ -604,12 +632,15 @@ class JsonApiTest extends TestCase
         $this->seed();
         $timesheet = Timesheet::find(1);
         $user = $timesheet->user;
+        $shift = Shift::factory()->make([
+            'timesheet_id' => $timesheet->id,
+        ]);
         $request_data = [
-            "data" => $this->fakeShiftData($timesheet),
+            "data" => $this->makeShiftResource($shift),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/shifts", $request_data);
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJson([
             "data" => [
                 "type" => "shifts",
@@ -624,12 +655,15 @@ class JsonApiTest extends TestCase
         $this->seed();
         $timesheet = Timesheet::find(1);
         $user = $timesheet->user;
+        $absence = Absence::factory()->make([
+            'timesheet_id' => $timesheet->id,
+        ]);
         $request_data = [
-            "data" => $this->fakeAbsenceData($timesheet),
+            "data" => $this->makeAbsenceResource($absence),
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/absences", $request_data);
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJson([
             "data" => [
                 "type" => "absences",
@@ -669,7 +703,7 @@ class JsonApiTest extends TestCase
         $user = $preset->user;
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/presets/{$preset->id}");
-        $response->assertStatus(200);
+        $response->assertSuccessful();
         $response->assertJson([
             "data" => [
                 "type" => "presets",
@@ -684,7 +718,7 @@ class JsonApiTest extends TestCase
         $user = User::find(1);
         $response = $this->actingAs($user)
             ->jsonApi("GET", "/presets");
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testDenyFetchPresetForOtherUser()
@@ -697,7 +731,7 @@ class JsonApiTest extends TestCase
         $this->assertEquals(2, $preset->id);
         $response = $this->actingAs($user)
             ->get("/presets/{$preset->id}");
-        $response->assertStatus(403);
+        $response->assertForbidden();
     }
 
     public function testCreatePreset()
@@ -712,7 +746,7 @@ class JsonApiTest extends TestCase
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/presets", $request_data);
-        $response->assertStatus(201);
+        $response->assertCreated();
         $response->assertJson([
             "data" => [
                 "type" => "presets",
@@ -735,7 +769,7 @@ class JsonApiTest extends TestCase
         ];
         $response = $this->actingAs($user)
             ->jsonApi("POST", "/presets", $request_data);
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $this->assertDatabaseCount("presets", 2);
     }
 
@@ -746,7 +780,7 @@ class JsonApiTest extends TestCase
         $user = $preset->user;
         $response = $this->actingAs($user)
             ->jsonApi("DELETE", "/presets/{$preset->id}");
-        $response->assertStatus(204);
+        $response->assertNoContent();
         $this->assertDatabaseCount("presets", 1);
     }
 
@@ -758,7 +792,7 @@ class JsonApiTest extends TestCase
         $user = $preset->user;
         $response = $this->actingAs($user)
             ->jsonApi("DELETE", "/presets/{$other_preset->id}");
-        $response->assertStatus(403);
+        $response->assertForbidden();
         $this->assertDatabaseCount("presets", 2);
     }
 }
