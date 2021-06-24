@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Leave;
 use App\Models\Preset;
 use App\Models\Setting;
 use App\Models\Timesheet;
@@ -132,6 +133,41 @@ class JsonApiTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * Creates a leave resource.
+     *
+     * @param User $user
+     *   The preset's owner.
+     *
+     * @return array
+     *   The preset resource data.
+     */
+    protected function makeLeaveResource(Leave $leave): array
+    {
+        $resource = [
+            "type" => "leaves",
+            "attributes" => [
+                "date" => $leave->date->toISO8601String(),
+                "hours" => $leave->hours,
+                "reason" => $leave->reason,
+            ],
+            "relationships" => [
+                "timesheet" => [
+                    "data" => [
+                        "type" => "timesheets",
+                        "id" => "{$leave->timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($leave->exists) {
+            $resource['id'] = (string) $leave->id;
+        }
+
+        return $resource;
     }
 
     /**
@@ -601,6 +637,29 @@ class JsonApiTest extends TestCase
             ]
         ]);
         $this->assertDatabaseCount("absences", 3);
+    }
+
+    public function testCreateLeave()
+    {
+        $this->seed();
+        $timesheet = Timesheet::find(1);
+        $user = $timesheet->user;
+        $leave = Leave::factory()->make([
+            'timesheet_id' => $timesheet->id,
+        ]);
+        $request_data = [
+            "data" => $this->makeLeaveResource($leave),
+        ];
+        $response = $this->actingAs($user)
+            ->jsonApi("POST", "/leaves", $request_data);
+        $response->assertCreated();
+        $response->assertJson([
+            "data" => [
+                "type" => "leaves",
+                "id" => "3",
+            ]
+        ]);
+        $this->assertDatabaseCount("leaves", 3);
     }
 
     public function testFetchPreset()

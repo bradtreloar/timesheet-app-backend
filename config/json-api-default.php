@@ -67,6 +67,7 @@ return [
     */
     'resources' => [
         'absences' => \App\Models\Absence::class,
+        'leaves' => \App\Models\Leave::class,
         'presets' => \App\Models\Preset::class,
         'settings' => \App\Models\Setting::class,
         'shifts' => \App\Models\Shift::class,
