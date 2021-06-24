@@ -21,8 +21,8 @@ class Timesheet extends Model
     ];
 
     protected $appends = [
-        'totalWeekdayShiftHours',
-        'totalLeaveHours',
+        'total_weekday_shift_hours',
+        'total_leave_hours',
         'entries',
     ];
 
@@ -37,24 +37,24 @@ class Timesheet extends Model
 
     public function getTotalWeekdayShiftHoursAttribute()
     {
-        $totalWeekdayShiftHours = 0;
+        $total_weekday_shift_hours = 0;
         $shifts = $this->shifts()->get();
         foreach ($shifts as $shift) {
             if ($shift->start->dayOfWeekIso <= 5) {
-                $totalWeekdayShiftHours += $shift->hours;
+                $total_weekday_shift_hours += $shift->hours;
             }
         }
-        return number_format($totalWeekdayShiftHours, 2);
+        return number_format($total_weekday_shift_hours, 2);
     }
 
     public function getTotalLeaveHoursAttribute()
     {
-        $totalLeaveHours = 0;
+        $total_leave_hours = 0;
         $leaves = $this->leaves()->get();
         foreach ($leaves as $leave) {
-            $totalLeaveHours += $leave->hours;
+            $total_leave_hours += $leave->hours;
         }
-        return number_format($totalLeaveHours, 2);
+        return number_format($total_leave_hours, 2);
     }
 
     public function getEntriesAttribute()

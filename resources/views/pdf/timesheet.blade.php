@@ -109,16 +109,16 @@ th {
                         <strong>Total Weekday Shift Hours</strong>
                     </td>
                     <td style="text-align:right;white-space:nowrap">
-                        {{ $timesheet->totalWeekdayShiftHours }} hours
+                        {{ $timesheet->total_weekday_shift_hours }} hours
                     </td>
                 </tr>
-                @if ($timesheet->totalLeaveHours > 0)
+                @if ($timesheet->total_leave_hours > 0)
                     <tr>
                         <td colspan="4" style="text-align:right;white-space:nowrap">
                             <strong>Total Leave Hours</strong>
                         </td>
                         <td style="text-align:right;white-space:nowrap">
-                            {{ $timesheet->totalLeaveHours }} hours
+                            {{ $timesheet->total_leave_hours }} hours
                         </td>
                     </tr>
                 @endif
