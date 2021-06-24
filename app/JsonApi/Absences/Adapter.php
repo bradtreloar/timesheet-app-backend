@@ -22,7 +22,10 @@ class Adapter extends AbstractAdapter
      *
      * @var array
      */
-    protected $filterScopes = [];
+    protected $filterScopes = [
+        'created' => 'created_at',
+        'changed' => 'updated_at',
+    ];
 
     /**
      * Adapter constructor.

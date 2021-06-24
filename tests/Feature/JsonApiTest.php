@@ -102,7 +102,7 @@ class JsonApiTest extends TestCase
             "attributes" => [
                 "start" => $shift->start->toISO8601String(),
                 "end" => $shift->end->toISO8601String(),
-                "break_duration" => $shift->break_duration,
+                "breakDuration" => $shift->break_duration,
             ],
             "relationships" => [
                 "timesheet" => [
@@ -239,9 +239,9 @@ class JsonApiTest extends TestCase
             "attributes" => [
                 "name" => $user->name,
                 "email" => $user->email,
-                "phone_number" => $user->phone_number,
-                "accepts_reminders" => $user->accepts_reminders,
-                "is_admin" => $user->is_admin,
+                "phoneNumber" => $user->phone_number,
+                "acceptsReminders" => $user->accepts_reminders,
+                "isAdmin" => $user->is_admin,
             ],
         ];
 

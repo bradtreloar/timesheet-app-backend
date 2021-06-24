@@ -32,7 +32,7 @@ class Schema extends SchemaProvider
         return [
             'start' => $resource->start->toISO8601String(),
             'end' => $resource->end->toISO8601String(),
-            'break_duration' => $resource->break_duration,
+            'breakDuration' => $resource->break_duration,
             'created' => $resource->created_at->toISO8601String(),
             'changed' => $resource->updated_at->toISO8601String(),
         ];
