@@ -66,12 +66,22 @@
         @endforeach
         <tr>
             <td colspan="4" style="text-align:left">
-                <strong>Total Weekday Hours</strong>
+                <strong>Total Weekday Shift Hours</strong>
             </td>
             <td style="text-align:right">
-                {{ $timesheet->totalWeekdayHours }} hours
+                {{ $timesheet->totalWeekdayShiftHours }} hours
             </td>
         </tr>
+        @if ($timesheet->totalLeaveHours > 0)
+            <tr>
+                <td colspan="4" style="text-align:left">
+                    <strong>Total Leave Hours</strong>
+                </td>
+                <td style="text-align:right">
+                    {{ $timesheet->totalLeaveHours }} hours
+                </td>
+            </tr>
+        @endif
         @foreach ($timesheet->entries as $entry)
             @if ($entry->date->dayOfWeekIso > 5)
                 <tr>
