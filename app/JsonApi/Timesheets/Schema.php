@@ -36,7 +36,6 @@ class Schema extends SchemaProvider
                 ? $resource->submitted_at->toISO8601String()
                 : null,
             'comment' => $resource->comment,
-            'is_completed' => $resource->is_completed,
         ];
     }
 
