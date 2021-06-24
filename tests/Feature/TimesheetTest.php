@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Events\TimesheetCompleted;
 use App\Models\Absence;
+use App\Models\Leave;
 use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
@@ -78,36 +79,45 @@ class TimesheetTest extends TestCase
      * Tests that Timesheet::shiftsAndAbsences returns an array of shifts
      * and absences sorted in chronological order.
      */
-    public function testgetShiftsAndAbsencesAttribute()
+    public function testgetEntriesAttribute()
     {
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
             "user_id" => $user->id,
         ]);
-        $shifts_and_absences = [];
+        $entries = [];
         for ($i = 6; $i >= 0; $i--) {
-            if (random_int(0, 1)) {
-                $shifts_and_absences[] = Shift::factory()->create([
-                    'timesheet_id' => $timesheet->id,
-                    'start' => Carbon::yesterday()->subDays($i),
-                    'end' => Carbon::yesterday()->subDays($i)->addHours(8),
-                ]);
-            } else {
-                $shifts_and_absences[] = Absence::factory()->create([
-                    'timesheet_id' => $timesheet->id,
-                    'date' => Carbon::yesterday()->subDays($i),
-                ]);
+            switch(random_int(0, 2)) {
+                case 0:
+                    $entries[] = Shift::factory()->create([
+                        'timesheet_id' => $timesheet->id,
+                        'start' => Carbon::yesterday()->subDays($i),
+                        'end' => Carbon::yesterday()->subDays($i)->addHours(8),
+                    ]);
+                    break;
+                case 1:
+                    $entries[] = Absence::factory()->create([
+                        'timesheet_id' => $timesheet->id,
+                        'date' => Carbon::yesterday()->subDays($i),
+                    ]);
+                    break;
+                case 2:
+                    $entries[] = Leave::factory()->create([
+                        'timesheet_id' => $timesheet->id,
+                        'date' => Carbon::yesterday()->subDays($i),
+                    ]);
+                    break;
             }
         }
 
-        foreach ($timesheet->shifts_and_absences as $index => $shift_or_absence) {
+        foreach ($timesheet->entries as $index => $entry) {
             $this->assertEquals(
-                $shift_or_absence->id,
-                $shifts_and_absences[$index]->id
+                $entry->id,
+                $entries[$index]->id
             );
             $this->assertEquals(
-                get_class($shift_or_absence),
-                get_class($shifts_and_absences[$index])
+                get_class($entry),
+                get_class($entries[$index])
             );
         }
     }

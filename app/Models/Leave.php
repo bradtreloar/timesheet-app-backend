@@ -11,11 +11,11 @@ class Leave extends Model
     use HasFactory;
 
     protected $fillable = [
-        'date', 'type', 'hours',
+        'date', 'reason', 'hours',
     ];
 
     protected $appends = [
-        'typeLabel'
+        'reasonLabel'
     ];
 
     protected $dates = [

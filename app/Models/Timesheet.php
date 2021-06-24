@@ -22,7 +22,7 @@ class Timesheet extends Model
 
     protected $appends = [
         'totalWeekdayHours',
-        'shifts_and_absences',
+        'entries',
     ];
 
     /**
@@ -46,12 +46,13 @@ class Timesheet extends Model
         return number_format($totalWeekdayHours, 2);
     }
 
-    public function getShiftsAndAbsencesAttribute()
+    public function getEntriesAttribute()
     {
         $shifts = $this->shifts->sortBy('start');
         $absences = $this->absences->sortBy('date');
+        $leaves = $this->leaves->sortBy('date');
         $entries = [];
-        array_push($entries, ...$shifts, ...$absences);
+        array_push($entries, ...$shifts, ...$absences, ...$leaves);
         usort($entries, function ($a, $b) {
             return $b->date->diffInDays($a->date, false);
         });
@@ -66,6 +67,11 @@ class Timesheet extends Model
     public function absences(): HasMany
     {
         return $this->hasMany(Absence::class);
+    }
+
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
     }
 
     public function shifts(): HasMany

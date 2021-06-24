@@ -24,7 +24,7 @@ class LeaveFactory extends Factory
     {
         return [
             'date' => Carbon::yesterday(),
-            'type' => 'absent:sick-day',
+            'reason' => 'absent:sick-day',
             'hours' => (float) random_int(1, 8),
         ];
     }

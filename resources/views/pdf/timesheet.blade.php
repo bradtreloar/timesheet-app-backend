@@ -70,7 +70,7 @@ th {
                 </tr>
             </thead>
             <tbody style="text-align: left;vertical-align:top;">
-                @foreach ($timesheet->shifts_and_absences as $entry)
+                @foreach ($timesheet->entries as $entry)
                     @if ($entry->date->dayOfWeekIso <= 5)
                         <tr>
                             <td style="width:100%">
@@ -86,6 +86,13 @@ th {
                                 <td style="text-align:right;white-space:nowrap">
                                     {{ $entry->break_duration }} min
                                 </td>
+                                <td style="text-align:right;white-space:nowrap">
+                                    {{ $entry->hours }} hours
+                                </td>
+                            @elseif (get_class($entry) == "App\Models\Leave")
+                                <td colspan="3" style="text-align:right;white-space:nowrap">
+                                    {{ $entry->reasonLabel }}
+                                <td>
                                 <td style="text-align:right;white-space:nowrap">
                                     {{ $entry->hours }} hours
                                 </td>
@@ -105,7 +112,7 @@ th {
                         {{ $timesheet->totalWeekdayHours }} hours
                     </td>
                 </tr>
-                @foreach ($timesheet->shifts_and_absences as $entry)
+                @foreach ($timesheet->entries as $entry)
                     @if ($entry->date->dayOfWeekIso > 5)
                         <tr>
                             <td style="width:100%">
@@ -121,6 +128,13 @@ th {
                                 <td style="text-align:right;white-space:nowrap">
                                     {{ $entry->break_duration }} min
                                 </td>
+                                <td style="text-align:right;white-space:nowrap">
+                                    {{ $entry->hours }} hours
+                                </td>
+                            @elseif (get_class($entry) == "App\Models\Leave")
+                                <td colspan="3" style="text-align:right;white-space:nowrap">
+                                    {{ $entry->reasonLabel }}
+                                <td>
                                 <td style="text-align:right;white-space:nowrap">
                                     {{ $entry->hours }} hours
                                 </td>

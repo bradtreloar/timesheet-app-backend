@@ -17,7 +17,7 @@ class CreateLeavesTable extends Migration
             $table->id();
             $table->date('date');
             $table->enum(
-                'type',
+                'reason',
                 [
                     "absent:sick-day",
                     "annual-leave",

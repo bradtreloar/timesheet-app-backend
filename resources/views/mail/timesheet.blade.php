@@ -30,7 +30,7 @@
         </tr>
     <thead>
     <tbody>
-        @foreach ($timesheet->shifts_and_absences as $entry)
+        @foreach ($timesheet->entries as $entry)
             @if ($entry->date->dayOfWeekIso <= 5)
                 <tr>
                     <td style="text-align:left">
@@ -46,6 +46,13 @@
                         <td style="text-align:right">
                             {{ $entry->break_duration }} min
                         </td>
+                        <td style="text-align:right">
+                            {{ $entry->hours }} hours
+                        </td>
+                    @elseif (get_class($entry) == "App\Models\Leave")
+                        <td colspan="3" style="text-align:right">
+                            {{ $entry->reasonLabel }}
+                        <td>
                         <td style="text-align:right">
                             {{ $entry->hours }} hours
                         </td>
@@ -65,7 +72,7 @@
                 {{ $timesheet->totalWeekdayHours }} hours
             </td>
         </tr>
-        @foreach ($timesheet->shifts_and_absences as $entry)
+        @foreach ($timesheet->entries as $entry)
             @if ($entry->date->dayOfWeekIso > 5)
                 <tr>
                     <td style="text-align:left">
@@ -81,6 +88,13 @@
                         <td style="text-align:right">
                             {{ $entry->break_duration }} min
                         </td>
+                        <td style="text-align:right">
+                            {{ $entry->hours }} hours
+                        </td>
+                    @elseif (get_class($entry) == "App\Models\Leave")
+                        <td colspan="3" style="text-align:right">
+                            {{ $entry->reasonLabel }}
+                        <td>
                         <td style="text-align:right">
                             {{ $entry->hours }} hours
                         </td>

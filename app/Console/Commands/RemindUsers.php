@@ -56,9 +56,8 @@ class RemindUsers extends Command
         $start_of_timesheet_week = static::getStartOfCurrentTimesheetWeek();
         if ($timesheets) {
             foreach ($timesheets as $timesheet) {
-                /** @var (\App\Models\Absence|\App\Models\Shift)[] $entries */
-                $entries = $timesheet->shifts_and_absences;
-                foreach ($entries as $entry) {
+                /** @var (\App\Models\Absence|\App\Models\Leave|\App\Models\Shift)[] $entries */
+                foreach ($timesheet->entries as $entry) {
                     $diff = $start_of_timesheet_week->diffInDays($entry->date, false);
                     if ($diff >= 0 && $diff < 7) {
                         return true;
