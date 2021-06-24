@@ -52,9 +52,11 @@ class TimesheetTest extends TestCase
         $timesheet = Timesheet::factory()->create([
             "user_id" => $user->id,
         ]);
+        $this->assertNull($timesheet->submitted_at);
         $stateMachine = StateMachine::get($timesheet, 'timesheetState');
         $stateMachine->apply('complete');
         $this->assertEquals(Timesheet::STATE_COMPLETED, $timesheet->state);
+        $this->assertNotNull($timesheet->submitted_at);
     }
 
     /**

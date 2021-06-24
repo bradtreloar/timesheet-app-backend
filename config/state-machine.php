@@ -2,6 +2,8 @@
 
 use App\Models\Timesheet;
 use App\Services\TimesheetEventDispatcher;
+use Carbon\Carbon;
+use Sebdesign\SM\Event\TransitionEvent;
 
 return [
     'timesheetState' => [
@@ -21,6 +23,16 @@ return [
             ],
         ],
         'callbacks' => [
+            'before' => [
+                'on_complete' => [
+                    'on' => 'complete',
+                    'do' => function (Timesheet $timesheet) {
+                        $timesheet->submitted_at = Carbon::now();
+                        $timesheet->save();
+                    },
+                    'args' => ['object'],
+                ],
+            ],
             'after' => [
                 'on_complete' => [
                     'on' => 'complete',

@@ -33,6 +33,7 @@ class Timesheet extends Model
      */
     protected $attributes = [
         'state' => self::STATE_DRAFT,
+        'submitted_at' => null,
     ];
 
     public function getTotalWeekdayShiftHoursAttribute()
