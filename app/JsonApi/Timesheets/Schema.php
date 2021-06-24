@@ -32,6 +32,9 @@ class Schema extends SchemaProvider
         return [
             'created' => $resource->created_at->toISO8601String(),
             'changed' => $resource->updated_at->toISO8601String(),
+            'submitted' => $resource->submitted_at
+                ? $resource->submitted_at->toISO8601String()
+                : null,
             'comment' => $resource->comment,
             'is_completed' => $resource->is_completed,
         ];
