@@ -25,7 +25,7 @@ class MailTest extends TestCase
         $user = User::factory()->create();
         Mail::assertSent(function (WelcomeMessage $mail) use ($user) {
             return $mail->user->id === $user->id &&
-                   $mail->hasTo($user);
+                $mail->hasTo($user);
         });
     }
 
@@ -57,7 +57,7 @@ class MailTest extends TestCase
         $stateMachine->apply('complete');
         Mail::assertSent(function (TimesheetReceipt $mail) use ($timesheet) {
             return $mail->timesheet->id === $timesheet->id &&
-                   $mail->hasTo($timesheet->user);
+                $mail->hasTo($timesheet->user);
         });
     }
 
@@ -79,7 +79,7 @@ class MailTest extends TestCase
         foreach ($recipients as $recipient) {
             Mail::assertSent(function (TimesheetNotification $mail) use ($timesheet, $recipient) {
                 return $mail->timesheet->id === $timesheet->id &&
-                       $mail->hasTo($recipient);
+                    $mail->hasTo($recipient);
             });
         }
     }
@@ -93,6 +93,8 @@ class MailTest extends TestCase
     {
         $this->seed();
         $timesheet = Timesheet::first();
+        $stateMachine = StateMachine::get($timesheet, 'timesheetState');
+        $stateMachine->apply('complete');
         $user = $timesheet->user;
         $html_output = (new TimesheetNotification($timesheet))->render();
         $this->assertStringContainsString("Timesheet submitted", $html_output);
