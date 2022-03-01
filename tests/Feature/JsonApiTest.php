@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
@@ -553,6 +554,37 @@ class JsonApiTest extends TestCase
         $response->assertSuccessful();
         $data = $response->json("data");
         $this->assertEquals(1, count($data));
+    }
+
+    public function testFetchUpdatedTimesheetsForUser()
+    {
+        $user = User::factory()->create();
+        $date = Carbon::create(2001, 5, 21, 12, 0, 0);
+        $oldDate = (new Carbon($date))->subWeeks(1);
+        $newDate = (new Carbon($date))->addWeeks(1);
+        $oldTimesheet = Timesheet::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => $oldDate,
+            'updated_at' => $oldDate,
+        ]);
+        $newTimesheet = Timesheet::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => $newDate,
+            'updated_at' => $newDate,
+        ]);
+        $updatedTimesheet = Timesheet::factory()->create([
+            'user_id' => $user->id,
+            'created_at' => $oldDate,
+            'updated_at' => $newDate,
+        ]);
+
+        $queryString = 'filter[updated-after]=' . $date->toISOString();
+        $response = $this->actingAs($user)
+            ->jsonApi("GET", "/users/{$user->id}/timesheets?$queryString");
+
+        $response->assertSuccessful();
+        $data = $response->json("data");
+        $this->assertEquals(2, count($data));
     }
 
     public function testDenyFetchAllTimesheetsForOtherUser()

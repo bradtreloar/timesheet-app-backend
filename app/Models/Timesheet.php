@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Events\TimesheetCompleted;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -69,6 +71,11 @@ class Timesheet extends Model
             return $b->date->diffInDays($a->date, false);
         });
         return $entries;
+    }
+
+    public function scopeUpdatedAfter(Builder $query, string $cutoffDate)
+    {
+        return $query->where('updated_at', '>', Carbon::parse($cutoffDate));
     }
 
     public function user(): BelongsTo
