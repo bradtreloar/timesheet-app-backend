@@ -31,7 +31,8 @@ class Shift extends Model
         return number_format($shift_hours, 2);
     }
 
-    public function getDateAttribute() {
+    public function getDateAttribute()
+    {
         return $this->start;
     }
 
