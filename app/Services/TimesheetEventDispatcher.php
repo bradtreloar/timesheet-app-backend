@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\TimesheetCompleted;
+use App\Events\TimesheetSubmitted;
 use Illuminate\Support\Facades\Event;
 use Sebdesign\SM\Event\TransitionEvent;
 
@@ -16,7 +16,7 @@ class TimesheetEventDispatcher
          * @var \App\Models\Timesheet $timesheet
          */
         $timesheet = $transitionEvent->getStateMachine()->getObject();
-        $event = new TimesheetCompleted($timesheet);
+        $event = new TimesheetSubmitted($timesheet);
         Event::dispatch($event);
     }
 }

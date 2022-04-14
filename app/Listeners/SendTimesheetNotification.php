@@ -2,32 +2,34 @@
 
 namespace App\Listeners;
 
-use App\Events\TimesheetCompleted;
+use App\Events\TimesheetSubmitted;
 use App\Mail\TimesheetNotification;
 use App\Models\Setting;
-use App\Services\TimesheetPDFWriter;
-use Dompdf\Dompdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class SendTimesheetNotification
 {
     /**
      * Handle the event.
      *
-     * @param  TimesheetCompleted  $event
+     * @param  TimesheetSubmitted  $event
      * @return void
      */
-    public function handle(TimesheetCompleted $event)
+    public function handle(TimesheetSubmitted $event)
     {
         $timesheet = $event->timesheet;
 
-        $recipientsSetting = Setting::where('name', 'timesheetRecipients')->first();
-        $recipients = explode(",", $recipientsSetting->value);
-
-        foreach ($recipients as $recipient) {
-            Mail::to(trim($recipient))
-                ->send(new TimesheetNotification($timesheet));
+        if ($timesheet->email_sent_at == null) {
+            $recipientsSetting = Setting::where('name', 'timesheetRecipients')->first();
+            $recipients = explode(",", $recipientsSetting->value);
+    
+            foreach ($recipients as $recipient) {
+                Mail::to(trim($recipient))
+                    ->send(new TimesheetNotification($timesheet));
+            }
+    
+            $timesheet->email_sent_at = Carbon::now();
         }
     }
 }

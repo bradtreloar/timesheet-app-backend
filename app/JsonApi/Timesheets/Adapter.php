@@ -19,6 +19,7 @@ class Adapter extends AbstractAdapter
         'created' => 'created_at',
         'changed' => 'updated_at',
         'submitted' => 'submitted_at',
+        'emailSent' => 'email_sent_at',
     ];
 
     /**

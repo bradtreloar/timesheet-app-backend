@@ -35,6 +35,9 @@ class Schema extends SchemaProvider
             'submitted' => $resource->submitted_at
                 ? $resource->submitted_at->toISO8601String()
                 : null,
+            'email_sent_at' => $resource->email_sent_at
+                ? $resource->email_sent_at->toISO8601String()
+                : null,
             'comment' => $resource->comment,
         ];
     }

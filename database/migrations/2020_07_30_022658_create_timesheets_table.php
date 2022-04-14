@@ -19,6 +19,7 @@ class CreateTimesheetsTable extends Migration
             $table->string('state');
             $table->string('comment', 255)->nullable();
             $table->timestamp('submitted_at')->nullable();
+            $table->timestamp('email_sent_at')->nullable();
             $table->timestamps();
         });
     }

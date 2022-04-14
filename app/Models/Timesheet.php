@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use App\Events\TimesheetCompleted;
+use App\Events\TimesheetSubmitted;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Event;
 
 class Timesheet extends Model
 {
@@ -20,6 +21,7 @@ class Timesheet extends Model
 
     protected $fillable = [
         'comment',
+        'submitted_at',
     ];
 
     protected $appends = [
@@ -36,6 +38,7 @@ class Timesheet extends Model
     protected $attributes = [
         'state' => self::STATE_DRAFT,
         'submitted_at' => null,
+        'email_sent_at' => null,
     ];
 
     public function getTotalWeekdayShiftHoursAttribute()
@@ -96,5 +99,14 @@ class Timesheet extends Model
     public function shifts(): HasMany
     {
         return $this->hasMany(Shift::class);
+    }
+
+    protected static function booted()
+    {
+        static::updating(function (Timesheet $timesheet) {
+            if ($timesheet->submitted_at !== null) {
+                TimesheetSubmitted::dispatch($timesheet);
+            }
+        });
     }
 }

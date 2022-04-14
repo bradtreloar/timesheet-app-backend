@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Events\TimesheetCompleted;
+use App\Events\TimesheetSubmitted;
 use App\Models\Absence;
 use App\Models\Leave;
 use App\Models\Shift;
@@ -43,56 +43,38 @@ class TimesheetTest extends TestCase
     }
 
     /**
-     * Timesheet state updates to complete when timesheet state transitions
-     * to complete.
+     * TimesheetSubmitted event fires when timesheet submitted_at date is set.
      */
-    public function testTimesheetStateTransition()
+    public function testTimesheetSubmittedEventTriggersWhenSubmitted()
     {
         $this->fakeTimesheetEvents();
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
             "user_id" => $user->id,
         ]);
-        $this->assertNull($timesheet->submitted_at);
-        $stateMachine = StateMachine::get($timesheet, 'timesheetState');
-        $stateMachine->apply('complete');
-        $this->assertEquals(Timesheet::STATE_COMPLETED, $timesheet->state);
-    }
-
-    /**
-     * Timesheet submitted data is set when timesheet state transitions
-     * to complete.
-     */
-    public function testTimesheetSubmittedAtUpdated()
-    {
-        $this->fakeTimesheetEvents();
-        $user = User::factory()->create();
-        $timesheet = Timesheet::factory()->create([
-            "user_id" => $user->id,
-        ]);
-        $this->assertNull($timesheet->submitted_at);
-        $stateMachine = StateMachine::get($timesheet, 'timesheetState');
-        $stateMachine->apply('complete');
-        $this->assertNotNull($timesheet->submitted_at);
-    }
-
-    /**
-     * TimesheetCompleted event fires when timesheet state transitions
-     * to complete.
-     */
-    public function testTimesheetCompletedEvent()
-    {
-        $this->fakeTimesheetEvents();
-        $user = User::factory()->create();
-        $timesheet = Timesheet::factory()->create([
-            "user_id" => $user->id,
-        ]);
-        $stateMachine = StateMachine::get($timesheet, 'timesheetState');
-        $stateMachine->apply('complete');
-        Event::assertDispatched(TimesheetCompleted::class);
-        Event::assertDispatched(function (TimesheetCompleted $event) use ($timesheet) {
+        $timesheet->submitted_at = Carbon::now();
+        $timesheet->save();
+        Event::assertDispatched(TimesheetSubmitted::class);
+        Event::assertDispatched(function (TimesheetSubmitted $event) use ($timesheet) {
             return $event->timesheet->id === $timesheet->id;
         });
+    }
+
+    /**
+     * @todo Timesheet email_sent_at date is set when email is sent.
+     */
+    public function testTimesheetEmailDateSetWhenMailSent()
+    {
+        $this->seed();
+        $user = User::factory()->create();
+        $timesheet = Timesheet::factory()->create([
+            "user_id" => $user->id,
+        ]);
+        $this->assertNull($timesheet->email_sent_at);
+        $timesheet->submitted_at = Carbon::now();
+        $timesheet->save();
+        $timesheet = Timesheet::find($timesheet->id);
+        $this->assertNotNull($timesheet->email_sent_at);
     }
 
     /**
@@ -148,7 +130,7 @@ class TimesheetTest extends TestCase
     protected function fakeTimesheetEvents()
     {
         Event::fake([
-            TimesheetCompleted::class
+            TimesheetSubmitted::class
         ]);
     }
 }
