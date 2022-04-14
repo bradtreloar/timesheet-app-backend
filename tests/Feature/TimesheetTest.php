@@ -43,7 +43,8 @@ class TimesheetTest extends TestCase
     }
 
     /**
-     * Tests that timesheet state transition.
+     * Timesheet state updates to complete when timesheet state transitions
+     * to complete.
      */
     public function testTimesheetStateTransition()
     {
@@ -56,11 +57,28 @@ class TimesheetTest extends TestCase
         $stateMachine = StateMachine::get($timesheet, 'timesheetState');
         $stateMachine->apply('complete');
         $this->assertEquals(Timesheet::STATE_COMPLETED, $timesheet->state);
+    }
+
+    /**
+     * Timesheet submitted data is set when timesheet state transitions
+     * to complete.
+     */
+    public function testTimesheetSubmittedAtUpdated()
+    {
+        $this->fakeTimesheetEvents();
+        $user = User::factory()->create();
+        $timesheet = Timesheet::factory()->create([
+            "user_id" => $user->id,
+        ]);
+        $this->assertNull($timesheet->submitted_at);
+        $stateMachine = StateMachine::get($timesheet, 'timesheetState');
+        $stateMachine->apply('complete');
         $this->assertNotNull($timesheet->submitted_at);
     }
 
     /**
-     * Tests that the TimesheetCompleted event is fired.
+     * TimesheetCompleted event fires when timesheet state transitions
+     * to complete.
      */
     public function testTimesheetCompletedEvent()
     {
@@ -78,8 +96,8 @@ class TimesheetTest extends TestCase
     }
 
     /**
-     * Tests that Timesheet::shiftsAndAbsences returns an array of shifts
-     * and absences sorted in chronological order.
+     * Timesheet::entries returns an array of shifts, absences and leaves
+     * sorted in chronological order.
      */
     public function testgetEntriesAttribute()
     {
@@ -89,7 +107,7 @@ class TimesheetTest extends TestCase
         ]);
         $entries = [];
         for ($i = 6; $i >= 0; $i--) {
-            switch(random_int(0, 2)) {
+            switch (random_int(0, 2)) {
                 case 0:
                     $entries[] = Shift::factory()->create([
                         'timesheet_id' => $timesheet->id,
