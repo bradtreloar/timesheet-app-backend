@@ -4,50 +4,47 @@ namespace Tests\Unit\Models;
 
 use App\Models\Shift;
 use App\Models\Timesheet;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * @coversDefaultClass \App\Models\Shift
+ */
 class ShiftTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Tests that the shift model works.
+     * Has timesheet relationship.
      *
-     * @return void
+     * @covers ::timesheet
      */
-    public function testDatabase()
+    public function testHasTimesheetRelationship()
     {
-        $user = User::factory()->create();
-        $timesheet = Timesheet::factory()->create([
-            'user_id' => $user->id
-        ]);
-        $shift = Shift::factory()->create([
-            'timesheet_id' => $timesheet->id
-        ]);
-        $this->assertInstanceOf(
-            Timesheet::class,
-            $shift->timesheet()->getResults()
-        );
-        $this->assertDatabaseCount($shift->getTable(), 1);
-        $shift->delete();
-        $this->assertDeleted($shift);
+        $this->seed();
+        $this->assertEquals(Timesheet::first(), Shift::first()->timesheet);
     }
 
     /**
-     * Tests that the calculated property `hours` is working.
+     * Gets start date as entry date.
+     *
+     * @covers ::getDateAttribute
      */
-    public function testHours()
+    public function testGetDate()
     {
-        $user = User::factory()->create();
-        $timesheet = Timesheet::factory()->create([
-            'user_id' => $user->id
-        ]);
-        $shift = Shift::factory()->create([
-            'timesheet_id' => $timesheet->id
-        ]);
-        $this->assertNotNull($shift->hours);
-        $this->assertGreaterThan(0, (float) $shift->hours);
+        $this->seed();
+        $shift = Shift::first();
+        $this->assertEquals($shift->start, $shift->date);
+    }
+
+    /**
+     * Gets hours.
+     *
+     * @covers ::getHoursAttribute
+     */
+    public function testGetHours()
+    {
+        $this->seed();
+        $this->assertGreaterThan(0, (float) Shift::first()->hours);
     }
 }
