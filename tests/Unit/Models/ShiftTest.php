@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace Tests\Unit\Models;
 
+use App\Models\Shift;
+use App\Models\Timesheet;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

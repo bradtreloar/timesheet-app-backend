@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace Tests\Integration\Listeners;
 
 use App\Events\UserCreated;
 use App\Mail\WelcomeMessage;
