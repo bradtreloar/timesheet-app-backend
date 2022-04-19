@@ -2,17 +2,57 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Preset;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * @coversDefaultClass \App\Models\User
+ */
 class UserTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /**
-     * Tests that the user's name can be fatched in snakecase.
-     *
-     * @return void
+     * Has timesheets relationship
+     * 
+     * @covers ::timesheets
      */
-    public function testSnakeCaseName()
+    public function testHasTimesheetsRelationship()
+    {
+        $this->seed();
+        $this->assertCount(1, User::first()->timesheets);
+    }
+    
+    /**
+     * Has presets relationship
+     * 
+     * @covers ::presets
+     */
+    public function testHasPresetsRelationship()
+    {
+        $this->seed();
+        $this->assertCount(1, User::first()->presets);
+    }
+    
+    /**
+     * Gets default preset
+     * 
+     * @covers ::defaultPreset
+     */
+    public function testGetsDefaultPreset()
+    {
+        $this->seed();
+        $this->assertEquals(Preset::first(), User::first()->defaultPreset);
+    }
+
+    /**
+     * Converts user's name to snake case.
+     *
+     * @covers ::snakecase_name
+     */
+    public function testConvertNameToSnakeCase()
     {
         // Replace space with underscore and make text lowercase.
         $user = User::factory()->make([
