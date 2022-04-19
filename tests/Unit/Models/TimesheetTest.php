@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Models;
 
-use App\Events\TimesheetSubmitted;
 use App\Models\Absence;
 use App\Models\Leave;
 use App\Models\Shift;
@@ -13,26 +12,64 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
+/**
+ * @coversDefaultClass App\Models\Timesheet
+ */
 class TimesheetTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Tests that the timesheet's shift relationship is working.
+     * Has user relationship.
+     *
+     * @covers ::user
      */
-    public function testShiftsRelationship()
+    public function testHasUserRelationship()
     {
         $this->seed();
-        $timesheet = Timesheet::first();
-        $shifts = $timesheet->shifts;
-        $this->assertCount(1, $shifts);
+        $user = User::first();
+        $this->assertEquals($user, Timesheet::first()->user);
     }
 
     /**
-     * Timesheet::entries returns an array of shifts, absences and leaves
-     * sorted in chronological order.
+     * Has shifts relationship.
+     *
+     * @covers ::shifts
      */
-    public function testgetEntriesAttribute()
+    public function testHasShiftsRelationship()
+    {
+        $this->seed();
+        $this->assertCount(1, Timesheet::first()->shifts);
+    }
+
+    /**
+     * Has absences relationship.
+     *
+     * @covers ::absences
+     */
+    public function testHasAbsencesRelationship()
+    {
+        $this->seed();
+        $this->assertCount(1, Timesheet::first()->absences);
+    }
+
+    /**
+     * Has leaves relationship.
+     *
+     * @covers ::leaves
+     */
+    public function testHasLeavesRelationship()
+    {
+        $this->seed();
+        $this->assertCount(1, Timesheet::first()->leaves);
+    }
+
+    /**
+     * Returns shifts, absences and leaves sorted by date.
+     *
+     * @covers ::getEntriesAttribute
+     */
+    public function testGetEntriesSortedByDate()
     {
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
