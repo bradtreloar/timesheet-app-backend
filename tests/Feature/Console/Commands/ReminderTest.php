@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Feature\Console\Commands;
+namespace App\Console\Commands;
 
-use App\Console\Commands\RemindUsers;
 use App\Events\TimesheetDue;
 use App\Models\Shift;
 use App\Models\Timesheet;

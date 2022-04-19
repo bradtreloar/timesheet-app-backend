@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Feature\Mail;
+namespace App\Mail;
 
-use App\Mail\WelcomeMessage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;

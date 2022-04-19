@@ -1,10 +1,7 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace App\Models;
 
-use App\Models\Absence;
-use App\Models\Timesheet;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

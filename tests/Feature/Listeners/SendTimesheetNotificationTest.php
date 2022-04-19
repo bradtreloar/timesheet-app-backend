@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Listeners;
+namespace App\Listeners;
 
 use App\Events\TimesheetSubmitted;
 use App\Mail\TimesheetNotification;

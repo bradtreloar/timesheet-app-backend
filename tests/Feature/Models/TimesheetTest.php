@@ -1,17 +1,11 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace App\Models;
 
 use App\Events\TimesheetSubmitted;
-use App\Models\Absence;
-use App\Models\Leave;
-use App\Models\Shift;
-use App\Models\Timesheet;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Sebdesign\SM\Facade as StateMachine;
 use Tests\TestCase;
 
 class TimesheetTest extends TestCase

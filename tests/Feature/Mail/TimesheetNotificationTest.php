@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\Feature\Mail;
+namespace App\Mail;
 
 use App\Events\TimesheetSubmitted;
-use App\Mail\TimesheetNotification;
 use App\Models\Timesheet;
 use App\Models\User;
 use Carbon\Carbon;
