@@ -90,7 +90,7 @@ class User extends Authenticatable
         });
 
         static::created(function (User $user) {
-            Event::dispatch(new UserCreated($user));
+            UserCreated::dispatch($user);
         });
     }
 

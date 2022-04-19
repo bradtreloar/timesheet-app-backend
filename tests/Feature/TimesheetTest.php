@@ -43,9 +43,9 @@ class TimesheetTest extends TestCase
     }
 
     /**
-     * TimesheetSubmitted event fires when timesheet submitted_at date is set.
+     * Dispatches TimesheetSubmitted event when timesheet submitted_at set.
      */
-    public function testTimesheetSubmittedEventTriggersWhenSubmitted()
+    public function testDispatchesTimesheetSubmittedEventWhenTimesheetSubmittedAtSet()
     {
         $this->fakeTimesheetEvents();
         $user = User::factory()->create();

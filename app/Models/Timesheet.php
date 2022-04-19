@@ -15,10 +15,6 @@ class Timesheet extends Model
 {
     use HasFactory;
 
-    const STATE_DRAFT = 'timesheet.draft';
-
-    const STATE_COMPLETED = 'timesheet.completed';
-
     protected $fillable = [
         'comment',
         'submitted_at',
@@ -36,7 +32,6 @@ class Timesheet extends Model
      * @var array
      */
     protected $attributes = [
-        'state' => self::STATE_DRAFT,
         'submitted_at' => null,
         'email_sent_at' => null,
     ];

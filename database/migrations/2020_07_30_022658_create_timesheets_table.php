@@ -16,7 +16,6 @@ class CreateTimesheetsTable extends Migration
         Schema::create('timesheets', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id');
-            $table->string('state');
             $table->string('comment', 255)->nullable();
             $table->timestamp('submitted_at')->nullable();
             $table->timestamp('email_sent_at')->nullable();
