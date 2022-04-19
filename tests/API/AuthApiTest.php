@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\API;
 
 use App\Models\Preset;
 use App\Models\User;

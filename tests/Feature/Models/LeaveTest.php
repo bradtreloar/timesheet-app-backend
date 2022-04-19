@@ -1,19 +1,19 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Models;
 
-use App\Models\Absence;
+use App\Models\Leave;
 use App\Models\Timesheet;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class AbsenceTest extends TestCase
+class LeaveTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * Tests that the absence model works.
+     * Tests that the leave model works.
      *
      * @return void
      */
@@ -23,15 +23,15 @@ class AbsenceTest extends TestCase
         $timesheet = Timesheet::factory()->create([
             'user_id' => $user->id
         ]);
-        $absence = Absence::factory()->create([
+        $leave = Leave::factory()->create([
             'timesheet_id' => $timesheet->id
         ]);
         $this->assertInstanceOf(
             Timesheet::class,
-            $absence->timesheet()->getResults()
+            $leave->timesheet()->getResults()
         );
-        $this->assertDatabaseCount($absence->getTable(), 1);
-        $absence->delete();
-        $this->assertDeleted($absence);
+        $this->assertDatabaseCount($leave->getTable(), 1);
+        $leave->delete();
+        $this->assertDeleted($leave);
     }
 }

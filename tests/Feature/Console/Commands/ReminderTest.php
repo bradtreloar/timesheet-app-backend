@@ -1,10 +1,9 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Console\Commands;
 
 use App\Console\Commands\RemindUsers;
 use App\Events\TimesheetDue;
-use App\Models\Absence;
 use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
