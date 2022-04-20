@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Integration\Console\Commands;
+namespace Tests\Unit\Console\Commands;
 
 use App\Console\Commands\RemindUsers;
 use App\Events\TimesheetDue;
@@ -31,7 +31,7 @@ class ReminderTest extends TestCase
     public function testUserHasCurrentTimesheet()
     {
         $start_of_timesheet_week = ReminderTest::getStartOfCurrentTimesheetWeek();
-        
+
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
             'user_id' => $user->id,
@@ -49,7 +49,7 @@ class ReminderTest extends TestCase
     public function testUserNotHasCurrentTimesheet()
     {
         $start_of_timesheet_week = ReminderTest::getStartOfCurrentTimesheetWeek();
-        
+
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
             'user_id' => $user->id,
@@ -62,7 +62,7 @@ class ReminderTest extends TestCase
         ]);
         $command = new RemindUsers();
         $this->assertFalse($command->userHasCurrentTimesheet($user));
-        
+
         $user = User::factory()->create();
         $timesheet = Timesheet::factory()->create([
             'user_id' => $user->id,
