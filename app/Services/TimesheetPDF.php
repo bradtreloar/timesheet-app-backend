@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Timesheet;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 
 class TimesheetPDF
 {
@@ -13,14 +14,17 @@ class TimesheetPDF
      */
     public static function create($timesheet)
     {
-        $filename = "timesheet_{$timesheet->created_at->getTimestamp()}_{$timesheet->user->snakecase_name}.pdf";
+        $timestamp = $timesheet->created_at->getTimestamp();
+        $username = $timesheet->user->snakecase_name;
+        $filename = "timesheet_{$timestamp}_{$username}.pdf";
         $storage = Storage::disk('temporary');
 
         if ($storage->missing($filename)) {
-            $dompdf = new Dompdf();
-            $dompdf->loadHtml(view('pdf.timesheet', [
+            $html = View::make('pdf.timesheet', [
                 'timesheet' => $timesheet,
-            ]));
+            ]);
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
             $storage->put($filename, $dompdf->output());
