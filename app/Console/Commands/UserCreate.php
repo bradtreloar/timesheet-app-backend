@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserCreate extends Command
 {
@@ -36,6 +37,7 @@ class UserCreate extends Command
                 "email" => $this->argument("email"),
                 'is_admin' => $this->option("admin"),
             ]);
+            $user->password = Hash::make(Str::random(40));
             $user->markEmailAsVerified();
             $user->save();
             return 0;
