@@ -3,16 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Events\TimesheetDue;
-use App\Models\Absence;
-use App\Models\Setting;
-use App\Models\Shift;
 use App\Models\Timesheet;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Hash;
 
 class RemindUsers extends Command
 {
