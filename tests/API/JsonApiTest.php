@@ -54,205 +54,6 @@ class JsonApiTest extends TestCase
         return parent::json($method, $uri, $data, $headers);
     }
 
-    /**
-     * Creates a timesheet resource.
-     *
-     * @param \App\Models\Timesheet $timesheet
-     *   The timesheet.
-     *
-     * @return array
-     *   The timesheet resource data.
-     */
-    protected function makeTimesheetResource(Timesheet $timesheet): array
-    {
-        $resource = [
-            "type" => "timesheets",
-            "attributes" => [
-                "comment" => $timesheet->comment,
-            ],
-            "relationships" => [
-                "user" => [
-                    "data" => [
-                        "type" => "users",
-                        "id" => "{$timesheet->user->id}",
-                    ]
-                ],
-            ],
-        ];
-
-        if ($timesheet->exists) {
-            $resource['id'] = (string) $timesheet->id;
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Creates a shift resource.
-     *
-     * @param \App\Models\Shift $shift
-     *   The shift.
-     *
-     * @return array
-     *   The shift resource data.
-     */
-    protected function makeShiftResource(Shift $shift): array
-    {
-        $resource = [
-            "type" => "shifts",
-            "attributes" => [
-                "start" => $shift->start->toISO8601String(),
-                "end" => $shift->end->toISO8601String(),
-                "breakDuration" => $shift->break_duration,
-            ],
-            "relationships" => [
-                "timesheet" => [
-                    "data" => [
-                        "type" => "timesheets",
-                        "id" => "{$shift->timesheet->id}",
-                    ]
-                ],
-            ],
-        ];
-
-        if ($shift->exists) {
-            $resource['id'] = (string) $shift->id;
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Creates an absence resource.
-     *
-     * @param \App\Models\Absence $absence
-     *   The absence.
-     *
-     * @return array
-     *   The absence resource data.
-     */
-    protected function makeAbsenceResource(Absence $absence): array
-    {
-        $resource = [
-            "type" => "absences",
-            "attributes" => [
-                "date" => $absence->date->toISO8601String(),
-                "reason" => $absence->reason,
-            ],
-            "relationships" => [
-                "timesheet" => [
-                    "data" => [
-                        "type" => "timesheets",
-                        "id" => "{$absence->timesheet->id}",
-                    ]
-                ],
-            ],
-        ];
-
-        if ($absence->exists) {
-            $resource['id'] = (string) $absence->id;
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Creates a leave resource.
-     *
-     * @param \App\Models\Leave $leave
-     *   The leave.
-     *
-     * @return array
-     *   The leave resource data.
-     */
-    protected function makeLeaveResource(Leave $leave): array
-    {
-        $resource = [
-            "type" => "leaves",
-            "attributes" => [
-                "date" => $leave->date->toISO8601String(),
-                "hours" => $leave->hours,
-                "reason" => $leave->reason,
-            ],
-            "relationships" => [
-                "timesheet" => [
-                    "data" => [
-                        "type" => "timesheets",
-                        "id" => "{$leave->timesheet->id}",
-                    ]
-                ],
-            ],
-        ];
-
-        if ($leave->exists) {
-            $resource['id'] = (string) $leave->id;
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Creates a preset resource.
-     *
-     * @param \App\Models\Preset $preset
-     *   The preset.
-     *
-     * @return array
-     *   The preset resource data.
-     */
-    protected function makePresetResource(Preset $preset): array
-    {
-        $resource = [
-            "type" => "presets",
-            "attributes" => [
-                "values" => $preset->values,
-            ],
-            "relationships" => [
-                "user" => [
-                    "data" => [
-                        "type" => "users",
-                        "id" => "{$preset->user->id}",
-                    ]
-                ],
-            ],
-        ];
-
-        if ($preset->exists) {
-            $resource['id'] = (string) $preset->id;
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Creates a user resource.
-     *
-     * @param \App\Models\User $user
-     *   The user.
-     *
-     * @return array
-     *   The user resource data.
-     */
-    protected function makeUserResource(User $user)
-    {
-        $resource = [
-            "type" => "users",
-            "attributes" => [
-                "name" => $user->name,
-                "email" => $user->email,
-                "phoneNumber" => $user->phone_number,
-                "acceptsReminders" => $user->accepts_reminders,
-                "isAdmin" => $user->is_admin,
-            ],
-        ];
-
-        if ($user->exists) {
-            $resource['id'] = (string) $user->id;
-        }
-
-        return $resource;
-    }
-
     public function testRejectUnauthenticated()
     {
         $this->seed();
@@ -826,5 +627,204 @@ class JsonApiTest extends TestCase
             ->jsonApi("DELETE", "/presets/{$other_preset->id}");
         $response->assertForbidden();
         $this->assertDatabaseCount("presets", 2);
+    }
+
+    /**
+     * Creates a timesheet resource.
+     *
+     * @param \App\Models\Timesheet $timesheet
+     *   The timesheet.
+     *
+     * @return array
+     *   The timesheet resource data.
+     */
+    protected function makeTimesheetResource(Timesheet $timesheet): array
+    {
+        $resource = [
+            "type" => "timesheets",
+            "attributes" => [
+                "comment" => $timesheet->comment,
+            ],
+            "relationships" => [
+                "user" => [
+                    "data" => [
+                        "type" => "users",
+                        "id" => "{$timesheet->user->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($timesheet->exists) {
+            $resource['id'] = (string) $timesheet->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates a shift resource.
+     *
+     * @param \App\Models\Shift $shift
+     *   The shift.
+     *
+     * @return array
+     *   The shift resource data.
+     */
+    protected function makeShiftResource(Shift $shift): array
+    {
+        $resource = [
+            "type" => "shifts",
+            "attributes" => [
+                "start" => $shift->start->toISO8601String(),
+                "end" => $shift->end->toISO8601String(),
+                "breakDuration" => $shift->break_duration,
+            ],
+            "relationships" => [
+                "timesheet" => [
+                    "data" => [
+                        "type" => "timesheets",
+                        "id" => "{$shift->timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($shift->exists) {
+            $resource['id'] = (string) $shift->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates an absence resource.
+     *
+     * @param \App\Models\Absence $absence
+     *   The absence.
+     *
+     * @return array
+     *   The absence resource data.
+     */
+    protected function makeAbsenceResource(Absence $absence): array
+    {
+        $resource = [
+            "type" => "absences",
+            "attributes" => [
+                "date" => $absence->date->toISO8601String(),
+                "reason" => $absence->reason,
+            ],
+            "relationships" => [
+                "timesheet" => [
+                    "data" => [
+                        "type" => "timesheets",
+                        "id" => "{$absence->timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($absence->exists) {
+            $resource['id'] = (string) $absence->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates a leave resource.
+     *
+     * @param \App\Models\Leave $leave
+     *   The leave.
+     *
+     * @return array
+     *   The leave resource data.
+     */
+    protected function makeLeaveResource(Leave $leave): array
+    {
+        $resource = [
+            "type" => "leaves",
+            "attributes" => [
+                "date" => $leave->date->toISO8601String(),
+                "hours" => $leave->hours,
+                "reason" => $leave->reason,
+            ],
+            "relationships" => [
+                "timesheet" => [
+                    "data" => [
+                        "type" => "timesheets",
+                        "id" => "{$leave->timesheet->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($leave->exists) {
+            $resource['id'] = (string) $leave->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates a preset resource.
+     *
+     * @param \App\Models\Preset $preset
+     *   The preset.
+     *
+     * @return array
+     *   The preset resource data.
+     */
+    protected function makePresetResource(Preset $preset): array
+    {
+        $resource = [
+            "type" => "presets",
+            "attributes" => [
+                "values" => $preset->values,
+            ],
+            "relationships" => [
+                "user" => [
+                    "data" => [
+                        "type" => "users",
+                        "id" => "{$preset->user->id}",
+                    ]
+                ],
+            ],
+        ];
+
+        if ($preset->exists) {
+            $resource['id'] = (string) $preset->id;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Creates a user resource.
+     *
+     * @param \App\Models\User $user
+     *   The user.
+     *
+     * @return array
+     *   The user resource data.
+     */
+    protected function makeUserResource(User $user)
+    {
+        $resource = [
+            "type" => "users",
+            "attributes" => [
+                "name" => $user->name,
+                "email" => $user->email,
+                "phoneNumber" => $user->phone_number,
+                "acceptsReminders" => $user->accepts_reminders,
+                "isAdmin" => $user->is_admin,
+            ],
+        ];
+
+        if ($user->exists) {
+            $resource['id'] = (string) $user->id;
+        }
+
+        return $resource;
     }
 }
