@@ -79,20 +79,6 @@ class User extends Authenticatable
         return $name;
     }
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            // Generate a random password if the user was created without one.
-            if (!$model->password) {
-                $model->password = Hash::make(Str::random(40));
-            }
-        });
-
-        static::created(function (User $user) {
-            UserCreated::dispatch($user);
-        });
-    }
-
     /**
      * Route notifications for the SMS channel.
      *
@@ -102,5 +88,19 @@ class User extends Authenticatable
     public function routeNotificationForSMS(SMSNotification $notification)
     {
         return $this->phone_number;
+    }
+
+    protected static function booted()
+    {
+        static::creating(function (User $user) {
+            // Generate a random password if the user was created without one.
+            if (!$user->password) {
+                $user->password = Hash::make(Str::random(40));
+            }
+        });
+
+        static::created(function (User $user) {
+            UserCreated::dispatch($user);
+        });
     }
 }
