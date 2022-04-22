@@ -1,12 +1,8 @@
 {
-    "name": "laravel/laravel",
-    "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": [
-        "framework",
-        "laravel"
-    ],
+    "name": "bradtreloar/timesheet-app-backend",
+    "description": "Backend for Allbiz Timesheet app.",
     "license": "MIT",
+    "type": "project",
     "require": {
         "php": "^7.2.5",
         "cloudcreativity/laravel-json-api": "^3.0",
